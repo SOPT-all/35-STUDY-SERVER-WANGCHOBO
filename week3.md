@@ -134,3 +134,44 @@ public UserDTO convertToDTO(User user) {
     return new UserDTO(user.getId(), user.getUsername());
 }
 
+# Dirty Checking (더티 체킹)
+
+JPA에서 트랜잭션 내에서 엔티티가 변경되면 자동으로 데이터베이스에 반영되도록 하는 기능.
+
+- **작동 방식**:
+  - 트랜잭션이 시작되고 엔티티가 조회된 상태에서 필드를 변경하면 JPA는 이를 감지하고, 트랜잭션 종료 시점에 변경 사항을 자동으로 데이터베이스에 반영함.
+  - JPA는 조회한 엔티티의 초기 상태를 보관하고, 트랜잭션 종료 시 현재 상태와 비교하여 변경된 필드가 있으면 SQL UPDATE 명령을 실행함.
+- **효과**: `save()` 호출 없이도 트랜잭션 종료 시점에 변경 사항이 자동으로 커밋되며, 코드가 간결해지고 엔티티의 변경이 데이터베이스와 자동 동기화된다!
+
+## Dirty Checking (더티 체킹) 사용 여부에 따른 코드 비교
+
+### 더티 체킹을 사용하지 않은 코드
+
+```java
+public void updateDiaryTitle(Long diaryId, DiaryRequest diaryRequest) {
+    Diary diary = diaryRepository.findById(diaryId)
+        .orElseThrow(() -> new EntityNotFoundException("Diary not found"));
+
+    // 제목이 존재하고 30자를 넘지 않으면 수정
+    if (diaryRequest.getTitle() != null && diaryRequest.getTitle().length() <= 30) {
+        diary.setTitle(diaryRequest.getTitle());
+        diaryRepository.save(diary); // save()를 호출하여 변경 사항을 명시적으로 저장
+    }
+}
+
+### 더티 체킹을 사용한 코드
+
+```java
+@Transactional
+public void updateDiaryTitle(Long diaryId, DiaryRequest diaryRequest) {
+    Diary diary = diaryRepository.findById(diaryId)
+        .orElseThrow(() -> new EntityNotFoundException("Diary not found"));
+
+    // 제목이 존재하고 30자를 넘지 않으면 수정
+    if (diaryRequest.getTitle() != null && diaryRequest.getTitle().length() <= 30) {
+        diary.setTitle(diaryRequest.getTitle());
+        // save()를 호출하지 않아도 트랜잭션 종료 시점에 변경 사항이 자동으로 반영됨
+    }
+}
+
+
