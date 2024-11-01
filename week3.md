@@ -63,7 +63,7 @@ Master-Slave 구조는 데이터베이스 서버를 **주(Master) 서버와 부(
 
 # JPA
 
-- **JPA(Java Persistence API)**는 현재 **ORM(Object Relational Mapping)**의 기술 표준
+**JPA(Java Persistence API)**는 현재 **ORM(Object Relational Mapping)**의 기술 표준
   - ORM을 사용하기 위한 인터페이스를 모아둔 것
 
 JPA는 애플리케이션과 JDBC 사이에서 동작한다. JPA 내부에서 JDBC API를 사용하여 SQL을 호출하여 DB와 통신한다.
@@ -105,7 +105,7 @@ JPA를 사용하면 자바 컬렉션에 저장하듯이 JPA 에게 저장할 객
   - 엔티티 변경이 API 스펙에 직접 영향을 미친다 → 유지보수 어려워지고, 확장성 제한됨
   - 성능 이슈 (필요한 정보만을 선택적으로 제공 X → 성능 최적화가 어려워짐)
 
----
+
 
 ### 예시 코드
 
@@ -133,6 +133,9 @@ public class UserDTO {
 public UserDTO convertToDTO(User user) {
     return new UserDTO(user.getId(), user.getUsername());
 }
+```
+---
+
 
 # Dirty Checking (더티 체킹)
 
@@ -158,6 +161,7 @@ public void updateDiaryTitle(Long diaryId, DiaryRequest diaryRequest) {
         diaryRepository.save(diary); // save()를 호출하여 변경 사항을 명시적으로 저장
     }
 }
+```
 
 ### 더티 체킹을 사용한 코드
 
@@ -173,5 +177,7 @@ public void updateDiaryTitle(Long diaryId, DiaryRequest diaryRequest) {
         // save()를 호출하지 않아도 트랜잭션 종료 시점에 변경 사항이 자동으로 반영됨
     }
 }
+```
+
 
 
